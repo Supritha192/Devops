@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "0.3",
+  "description": "Document to invoke lambda function",
+  "assumeRole": "arn:aws:iam::631316890102:role/ssm-invoke-lambda-s3",
+  "mainSteps": [
+    {
+      "name": "invokeFunction",
+      "action": "aws:executeScript",
+      "isEnd": true,
+      "inputs": {
+        "Runtime": "python3.8",
+        "Handler": "invoke_function",
+        "InputPayload": {
+          "functionName": "arn:aws:lambda:us-east-1:631316890102:function:mys3lambdab",
+          "payload": {
+            "Name": "my-passport-photo.jpg"
+          }
+        },
+        "Script": "import boto3\nimport json\n\ndef invoke_function(event, context):\n    client = boto3.client('lambda')\n    response = client.invoke(\n        FunctionName=event['functionName'],\n        Payload=json.dumps(event['payload'])\n    )\n    \n    body = response['Payload'].read().decode(\"utf-8\")\n    \n    print(body)\n    return body"
+      }
+    }
+  ]
+}
